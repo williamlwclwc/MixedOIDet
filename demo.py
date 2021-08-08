@@ -84,7 +84,7 @@ if __name__ == "__main__":
     args = get_parser().parse_args()
     setup_logger(name="fvcore")
     logger = setup_logger()
-    logger.info("Arguments: " + str(args))
+    # logger.info("Arguments: " + str(args))
 
     cfg = setup_cfg(args)
 
@@ -101,7 +101,7 @@ if __name__ == "__main__":
 
     if args.input:
         if len(args.input) == 1:
-            args.input = glob.glob(os.path.expanduser(args.input[0]))
+            args.input = glob.glob(os.path.expanduser(args.input[0]+'/*.jpg'))
             assert args.input, "The input path(s) was not found"
         for path in tqdm.tqdm(args.input):
             # use PIL, to be consistent with evaluation

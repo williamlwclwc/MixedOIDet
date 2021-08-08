@@ -1,10 +1,23 @@
 # Mixed Open Images Detector For Nocaps
 
+* This repo contains an automatic script that combines the results of Pretrained 
+[Nocaps object detector](https://github.com/nocaps-org/image-feature-extractors) and [UniDet detector](https://github.com/xingyizhou/UniDet) 
+to produce better predictions for all 600 classes of Open Images / Nocaps 
+
 ## Referenced Detectors
 
 * We combined the following detectors together to achieve better detection results for all 600 classes of Open Images without retraining: 
     * [Nocaps Provided Detector](https://github.com/nocaps-org/image-feature-extractors)
     * [2020 Open Images Challenge #1 - UniDet](https://github.com/xingyizhou/UniDet)
+
+## How we combine the results
+
+* We select one of the detectors' predictions for each class based on the mAP score experiment(see `./data/sub_list.json`, classes in that file we will use Nocaps detector, you can use a different json file), however, for some images for example, mAP score for class A of detector-1 is higher than of detector-2, but in this specific image, detector-1 makes no predictions while detector-2 predicts class A objects, in this case we will use detector-2 for that image, otherwise many images will have no bboxes output.
+
+* The list of images with no output predictions:
+    * Nocaps validation: all images have predictions
+    * Nocaps test: see `./output/nocaps_test_nooutput.txt`
+    * COCO train: see `./output/coco_train_nooutput.txt`
 
 ## Installation
 
@@ -34,20 +47,30 @@
 * `--nocaps_det_dir`: The path of nocaps detector image-feature-extractors (default: `../image-feature-extractors`)
 * `--UniDet_dir`: Path of UniDet dir (default: `../UniDet`)
 * `--UniDet_model`: Specify which UniDet model you want to use (default: `Unified_learned_OCI_R50_8x`)
+* `--device`: Specify which GPU you will use for the docker of nocaps detector (default: 0)
+* `--steps`: Specify which step you want to execute: 0: all 3 steps, 1: nocaps detector step only, 2: UniDet step only, 3: combination step only (default: 0)
 * `--output_format`: Format to save the combined detection (currently only tsv is supported, do not need to specify this for now)
+    * The tsv format we use here is the same as [Microsoft Oscar](https://github.com/microsoft/Oscar)
 
 ### Examples
 
-* Nocaps data inference: 
+* Nocaps validation data inference: 
     ```shell
     python run.py --input_imgs /data/private/liuwenchang/scene_graph_benchmark/others/nocaps_data/images_val \
     --input_annotations /data/private/liuwenchang/scene_graph_benchmark/others/nocaps_data/nocaps_val_image_info.json \
-    --output ./output/nocaps_val.tsv
-    ```
-* COCO data inference:
-    ```shell
-    python run.py --input_imgs /data/private/liuwenchang/UniDet/datasets/coco/train2014 \
-    --input_annotations /data/private/liuwenchang/UniDet/datasets/coco/annotations/instances_train2014.json \
-    --output ./output/coco_train.tsv
+    --device 7 --output ./output/nocaps_val
     ```
 
+* Nocaps test data inference: 
+    ```shell
+    python run.py --input_imgs /data/private/liuwenchang/scene_graph_benchmark/others/nocaps_data/images_test \
+    --input_annotations /data/private/liuwenchang/scene_graph_benchmark/others/nocaps_data/nocaps_test_image_info.json \
+    --device 7 --output ./output/nocaps_test
+    ```
+
+* COCO data inference:
+    ```shell
+    python run.py --input_imgs ../UniDet/datasets/coco/train2014 \
+    --input_annotations /data/private/liuwenchang/UniDet/datasets/coco/annotations/instances_train2014.json \
+    --device 7 --output ./output/coco_train
+    ```

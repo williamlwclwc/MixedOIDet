@@ -1,3 +1,11 @@
+/data/nocaps_detections_val.json
+/data/UniDet_predictions_val.json
+/data/nocaps_detections_test.json
+/data/UniDet_predictions_test.json
+/data/nocaps_detections_coco.json
+/data/UniDet_predictions_coco.json
 /data/nocaps_detections.json
 /data/UniDet_predictions.json
-/output/*
+/output/coco_train.tsv
+/output/nocaps_test.tsv
+/output/nocaps_val.tsv
